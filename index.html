@@ -1,0 +1,78 @@
+<!-- index.html -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/x-icon" href="images/smalllogo.png">
+  <title>FlowDraw</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
+    #canvas-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    #info-panel {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background-color: rgba(255, 255, 255, 0.8);
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 14px;
+      max-width: 300px;
+    }
+    .shortcut {
+      font-weight: bold;
+      color: #0066cc;
+    }
+    #status {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background-color: rgba(255, 255, 255, 0.8);
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div id="canvas-container">
+    <canvas id="canvas"></canvas>
+    <div id="status">Grid Size: 80 | Mode: Navigate</div>
+    <!--<div id="info-panel">
+      <h3>Keyboard Controls:</h3>
+      <p><span class="shortcut">h/j/k/l</span> - Move cursor left/down/up/right</p>
+      <p><span class="shortcut">[/]</span> - Decrease/Increase grid size</p>
+      <p><span class="shortcut">r</span> - Create rectangle (select corners)</p>
+      <p><span class="shortcut">a</span> - Create line (select points)</p>
+      <p>When creating a line, after setting both points:</p>
+      <p><span class="shortcut">Enter</span> - Simple line</p>
+      <p><span class="shortcut">j + Enter</span> - End arrow</p>
+      <p><span class="shortcut">k + Enter</span> - Both arrows</p>
+    </div>-->
+  </div>
+
+  <script src="state.js"></script>
+  <script src="canvas.js"></script>
+  <script src="shapes.js"></script>
+  <script src="text.js"></script>
+  <script src="ui.js"></script>
+  <script src="select.js"></script>
+  <script src="events.js"></script>
+  <script src="export.js"></script>
+  <script src="init.js"></script>
+</body>
+</html>
