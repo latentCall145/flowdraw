@@ -392,11 +392,7 @@ document.addEventListener('keydown', (e) => {
     state.isEditingText = true;
     state.tempShape = null;
 
-    //const { modal, input } = createTextInputModal();
     const editor = createDynamicTextEditor(cursorX, cursorY);
-    //document.body.appendChild(editor);
-    //input.focus();
-    //editor.focus();
   }
 
   updateStatus();
