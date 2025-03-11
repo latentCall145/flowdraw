@@ -93,15 +93,17 @@ function isPointInText(x, y, textShape) {
   
   // Check if point is within the text box
   return (
-    pX >= textLeft - 5 &&
-    pX <= textLeft + textWidth + 5 &&
-    pY >= textY - textHeight - 5 &&
-    pY <= textY + 5
+    pX >= textLeft &&
+    pX <= textLeft + textWidth &&
+    pY >= textY - textHeight &&
+    pY <= textY
   );
 }
 
 // Helper functions to determine if shapes are enclosed
 function isRectangleFullyEnclosed(rect, selBox) {
+  console.log(rect);
+  console.log(selBox);
   return (
     rect.x1 >= selBox.x1 && rect.x2 <= selBox.x2 &&
     rect.y1 >= selBox.y1 && rect.y2 <= selBox.y2
@@ -160,23 +162,23 @@ function lineIntersectsSegment(x1, y1, x2, y2, x3, y3, x4, y4) {
 }
 
 function isTextFullyEnclosed(text, selBox) {
-  // Assuming text has x, y coordinates for the top-left corner
-  // and approximate width and height (you may need to adjust this)
-  const textWidth = text.text.length * 8; // Approximation
-  const textHeight = 16; // Approximation
+  const metrics = ctx.measureText(text.text);
+  const textWidth = metrics.width / zoomLevel; // text width only variable changed from zoomLevel
+  const textHeight = text.fontSize;
   
   return (
-    text.x >= selBox.x1 && text.x + textWidth <= selBox.x2 &&
-    text.y >= selBox.y1 && text.y + textHeight <= selBox.y2
+    selBox.x1 <= text.x - textWidth / 2 && selBox.x2 >= text.x + textWidth / 2 &&
+    selBox.y1 <= text.y - textHeight && selBox.y2 >= text.y
   );
 }
 
 function isTextPartiallyEnclosed(text, selBox) {
-  const textWidth = text.text.length * 8; // Approximation
-  const textHeight = 16; // Approximation
+  const metrics = ctx.measureText(text.text);
+  const textWidth = metrics.width / zoomLevel; // text width only variable changed from zoomLevel
+  const textHeight = text.fontSize;
   
   return !(
-    text.x + textWidth < selBox.x1 || text.x > selBox.x2 ||
-    text.y + textHeight < selBox.y1 || text.y > selBox.y2
+    selBox.x1 > text.x + textWidth / 2 || selBox.x2 < text.x - textWidth / 2 ||
+    selBox.y1 > text.y + textHeight / 2 || selBox.y2 < text.y - textHeight / 2
   );
 }

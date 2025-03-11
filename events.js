@@ -12,12 +12,12 @@ document.addEventListener('keydown', (e) => {
   if (!state.isEditingText && e.key === 'i') {
     e.preventDefault();
   }
-  // Space key for selection
+  
+  // Start multi-select mode with Ctrl+Space
   if (e.key === ' ' && e.ctrlKey && state.mode === 'navigate' && !state.isEditingText) {
     e.preventDefault();
     
     state.multiSelectMode = true;
-    state.currentlySelecting = true;
     state.startX = cursorX;
     state.startY = cursorY;
     state.selectionBox = {
@@ -26,13 +26,81 @@ document.addEventListener('keydown', (e) => {
       x2: cursorX,
       y2: cursorY
     };
+    state.mode = 'multi-select';
     
-    // We'll determine the direction once the mouse moves
+    updateStatus();
     draw();
     return;
   }
-  //
-  else if (e.key === ' ' && state.mode === 'navigate' && !state.isEditingText) {
+  
+  // Finalize multi-select with Space
+  if (e.key === ' ' && state.mode === 'multi-select' && !state.isEditingText) {
+    e.preventDefault();
+    
+    // Normalize the selection box coordinates
+    const selBox = {
+      x1: Math.min(state.selectionBox.x1, state.selectionBox.x2),
+      y1: Math.min(state.selectionBox.y1, state.selectionBox.y2),
+      x2: Math.max(state.selectionBox.x1, state.selectionBox.x2),
+      y2: Math.max(state.selectionBox.y1, state.selectionBox.y2)
+    };
+    
+    // Clear previous selection
+    state.selectedShapeIndices = [];
+    
+    // Select shapes based on the selection box and direction
+    for (let i = 0; i < state.shapes.length; i++) {
+      const shape = state.shapes[i];
+      
+      if (shape.type === 'rectangle') {
+        // For left-to-right (blue), shapes must be fully enclosed
+        if (state.selectionBox.x1 <= state.selectionBox.x2) {
+          if (isRectangleFullyEnclosed(shape, selBox)) {
+            state.selectedShapeIndices.push(i);
+          }
+        } 
+        // For right-to-left (green), shapes can be partially enclosed
+        else {
+          if (isRectanglePartiallyEnclosed(shape, selBox)) {
+            state.selectedShapeIndices.push(i);
+          }
+        }
+      } else if (shape.type === 'line') {
+        // For left-to-right (blue), line must be fully enclosed
+        if (state.selectionBox.x1 <= state.selectionBox.x2) {
+          if (isLineFullyEnclosed(shape, selBox)) {
+            state.selectedShapeIndices.push(i);
+          }
+        } 
+        // For right-to-left (green), line can be partially enclosed
+        else {
+          if (isLinePartiallyEnclosed(shape, selBox)) {
+            state.selectedShapeIndices.push(i);
+          }
+        }
+      } else if (shape.type === 'text' || shape.type === 'label') {
+        // For text objects
+        if (state.selectionBox.x1 <= state.selectionBox.x2) {
+          if (isTextFullyEnclosed(shape, selBox)) {
+            state.selectedShapeIndices.push(i);
+          }
+        } else {
+          if (isTextPartiallyEnclosed(shape, selBox)) {
+            state.selectedShapeIndices.push(i);
+          }
+        }
+      }
+    }
+    
+    state.selectionBox = null;
+    state.mode = 'navigate';
+    updateStatus();
+    draw();
+    return;
+  }
+  
+  // Single-select with Space (when not in multi-select mode)
+  if (e.key === ' ' && state.mode === 'navigate' && !state.isEditingText && !e.ctrlKey) {
     e.preventDefault();
     
     // Try to select a shape under the cursor
@@ -60,67 +128,38 @@ document.addEventListener('keydown', (e) => {
     }
     
     state.selectedShapeIndex = selectedIndex;
+    state.multiSelectMode = false;
+    state.selectedShapeIndices = [];
     updateStatus();
     draw();
     return;
   }
   
-  // Move selected shape with H, J, K, L (case-sensitive)
-  /*if (state.selectedShapeIndex !== -1 && !state.isEditingText) {
-    const shape = state.shapes[state.selectedShapeIndex];
-    
-    if (e.key === 'H') {
+  // Update selection box in multi-select mode with HJKL
+  if (state.mode === 'multi-select') {
+    if (e.key === 'h' || e.key === 'ArrowLeft') {
       e.preventDefault();
-      if (shape.type === 'rectangle' || shape.type === 'line') {
-        shape.x1 -= gridSize;
-        shape.x2 -= gridSize;
-      } else if (shape.type === 'text' || shape.type === 'label') {
-        shape.x -= gridSize;
-      }
+      state.selectionBox.x2 = state.selectionBox.x2 - gridSize;
       draw();
       return;
-    } else if (e.key === 'L') {
+    } else if (e.key === 'l' || e.key === 'ArrowRight') {
       e.preventDefault();
-      if (shape.type === 'rectangle' || shape.type === 'line') {
-        shape.x1 += gridSize;
-        shape.x2 += gridSize;
-      } else if (shape.type === 'text' || shape.type === 'label') {
-        shape.x += gridSize;
-      }
+      state.selectionBox.x2 = state.selectionBox.x2 + gridSize;
       draw();
       return;
-    } else if (e.key === 'K') {
+    } else if (e.key === 'k' || e.key === 'ArrowUp') {
       e.preventDefault();
-      if (shape.type === 'rectangle' || shape.type === 'line') {
-        shape.y1 -= gridSize;
-        shape.y2 -= gridSize;
-      } else if (shape.type === 'text' || shape.type === 'label') {
-        shape.y -= gridSize;
-      }
+      state.selectionBox.y2 = state.selectionBox.y2 - gridSize;
       draw();
       return;
-    } else if (e.key === 'J') {
+    } else if (e.key === 'j' || e.key === 'ArrowDown') {
       e.preventDefault();
-      if (shape.type === 'rectangle' || shape.type === 'line') {
-        shape.y1 += gridSize;
-        shape.y2 += gridSize;
-      } else if (shape.type === 'text' || shape.type === 'label') {
-        shape.y += gridSize;
-      }
+      state.selectionBox.y2 = state.selectionBox.y2 + gridSize;
       draw();
       return;
     }
-    
-    // Delete selected shape with Delete key
-    if (e.key === 'd' || e.key === 'Delete') {
-      e.preventDefault();
-      state.shapes.splice(state.selectedShapeIndex, 1);
-      state.selectedShapeIndex = -1;
-      updateStatus();
-      draw();
-      return;
-    }
-  }*/
+  }
+
   // Modify the movement and deletion to work with multi-selection
   if ((state.selectedShapeIndex !== -1 || state.selectedShapeIndices.length > 0) && !state.isEditingText) {
     // Get all indices to operate on
@@ -202,99 +241,6 @@ document.addEventListener('keydown', (e) => {
     }
   }
 
-  // Add these mouse event handlers
-  /*document.addEventListener('mousemove', (e) => {
-    const rect = canvas.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    
-    // Update cursor position
-    cursorX = Math.floor(mouseX / gridSize) * gridSize;
-    cursorY = Math.floor(mouseY / gridSize) * gridSize;
-    
-    // Update selection box if in multi-select mode and currently selecting
-    if (state.multiSelectMode && state.currentlySelecting) {
-      state.selectionBox.x2 = cursorX;
-      state.selectionBox.y2 = cursorY;
-      
-      // Determine selection direction
-      if (state.selectionBox.x2 >= state.selectionBox.x1) {
-        state.selectionDirection = 'left-to-right'; // Blue, fully enclosed
-      } else {
-        state.selectionDirection = 'right-to-left'; // Green, partially enclosed
-      }
-      
-      draw();
-    }
-    
-    // Other existing mousemove code...
-  });
-
-  document.addEventListener('mouseup', (e) => {
-    if (state.multiSelectMode && state.currentlySelecting) {
-      state.currentlySelecting = false;
-      
-      // Normalize the selection box coordinates
-      const selBox = {
-        x1: Math.min(state.selectionBox.x1, state.selectionBox.x2),
-        y1: Math.min(state.selectionBox.y1, state.selectionBox.y2),
-        x2: Math.max(state.selectionBox.x1, state.selectionBox.x2),
-        y2: Math.max(state.selectionBox.y1, state.selectionBox.y2)
-      };
-      
-      // Clear previous selection
-      state.selectedShapeIndices = [];
-      
-      // Select shapes based on the selection box and direction
-      for (let i = 0; i < state.shapes.length; i++) {
-        const shape = state.shapes[i];
-        
-        if (shape.type === 'rectangle') {
-          // For left-to-right (blue), shapes must be fully enclosed
-          if (state.selectionDirection === 'left-to-right') {
-            if (isRectangleFullyEnclosed(shape, selBox)) {
-              state.selectedShapeIndices.push(i);
-            }
-          } 
-          // For right-to-left (green), shapes can be partially enclosed
-          else {
-            if (isRectanglePartiallyEnclosed(shape, selBox)) {
-              state.selectedShapeIndices.push(i);
-            }
-          }
-        } else if (shape.type === 'line') {
-          // For left-to-right (blue), line must be fully enclosed
-          if (state.selectionDirection === 'left-to-right') {
-            if (isLineFullyEnclosed(shape, selBox)) {
-              state.selectedShapeIndices.push(i);
-            }
-          } 
-          // For right-to-left (green), line can be partially enclosed
-          else {
-            if (isLinePartiallyEnclosed(shape, selBox)) {
-              state.selectedShapeIndices.push(i);
-            }
-          }
-        } else if (shape.type === 'text' || shape.type === 'label') {
-          // For text objects
-          if (state.selectionDirection === 'left-to-right') {
-            if (isTextFullyEnclosed(shape, selBox)) {
-              state.selectedShapeIndices.push(i);
-            }
-          } else {
-            if (isTextPartiallyEnclosed(shape, selBox)) {
-              state.selectedShapeIndices.push(i);
-            }
-          }
-        }
-      }
-      
-      draw();
-    }
-    
-    // Other existing mouseup code...
-  });*/
-
   // Rest of the existing keydown handler...
   if (!state.isEditingText && e.key === 't') {
     e.preventDefault();
@@ -356,14 +302,17 @@ document.addEventListener('keydown', (e) => {
     return;
   }
 
-  if (e.key === 'h' || e.key == 'ArrowLeft') {
-    cursorX -= gridSize;
-  } else if (e.key === 'l' || e.key == 'ArrowRight') {
-    cursorX += gridSize;
-  } else if (e.key === 'k' || e.key == 'ArrowUp') {
-    cursorY -= gridSize;
-  } else if (e.key === 'j' || e.key == 'ArrowDown') {
-    cursorY += gridSize;
+  // Only move cursor with hjkl if not in multi-select mode
+  if (state.mode !== 'multi-select') {
+    if (e.key === 'h' || e.key == 'ArrowLeft') {
+      cursorX -= gridSize;
+    } else if (e.key === 'l' || e.key == 'ArrowRight') {
+      cursorX += gridSize;
+    } else if (e.key === 'k' || e.key == 'ArrowUp') {
+      cursorY -= gridSize;
+    } else if (e.key === 'j' || e.key == 'ArrowDown') {
+      cursorY += gridSize;
+    }
   }
 
   if (e.key === 'r') {
@@ -383,10 +332,10 @@ document.addEventListener('keydown', (e) => {
     } else if (state.mode === 'rectangle-end') {
       state.shapes.push({
         type: 'rectangle',
-        x1: state.tempShape.x1,
-        y1: state.tempShape.y1,
-        x2: cursorX,
-        y2: cursorY,
+        x1: Math.min(cursorX, state.tempShape.x1),
+        y1: Math.min(cursorY, state.tempShape.y1),
+        x2: Math.max(cursorX, state.tempShape.x1),
+        y2: Math.max(cursorY, state.tempShape.y1),
         zIndex: state.zIndexCounter++
       });
       state.tempShape = null;
@@ -443,9 +392,11 @@ document.addEventListener('keydown', (e) => {
     state.isEditingText = true;
     state.tempShape = null;
 
-    const { modal, input } = createTextInputModal();
-    document.body.appendChild(modal);
-    input.focus();
+    //const { modal, input } = createTextInputModal();
+    const editor = createDynamicTextEditor(cursorX, cursorY);
+    //document.body.appendChild(editor);
+    //input.focus();
+    //editor.focus();
   }
 
   updateStatus();
