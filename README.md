@@ -4,7 +4,7 @@ This is an experiment with vibe coding - kind of. 95% of the code was generated 
 # FlowDraw - A Vim-Inspired Whiteboard Web App
 ![Logo](images/smalllogo.png)
 
-FlowDraw is a web-based whiteboard application designed for creating diagrams, flowcharts, and quick sketches. It features a grid-based canvas and Vim-like keyboard shortcuts for efficient navigation and drawing, eliminating the need for constant mouse interaction.  This README provides comprehensive documentation on how to use all of FlowDraw's features.
+[FlowDraw](https://latentcall145.github.io/flowdraw/index.html) is a web-based whiteboard application designed for creating diagrams, flowcharts, and quick sketches. It features a grid-based canvas and Vim-like keyboard shortcuts for efficient navigation and drawing, eliminating the need for constant mouse interaction.  This README provides comprehensive documentation on how to use all of FlowDraw's features.
 
 ## Keyboard Shortcuts Summary <a name="keyboard-shortcuts-summary"></a>
 
