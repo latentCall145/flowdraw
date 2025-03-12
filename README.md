@@ -1,9 +1,41 @@
-# FlowDraw - A Vim-Inspired Whiteboard Web App
-
 ## Disclaimer
-This is an experiment with vibe coding - kind of. 95% of the code was generated with Claude 3.7 Sonnet and this README was generated with Gemini 2.0 (except this disclaimer) over a weekend, although I had to fix bugs myself because Claude has super low rate limits. Also the app has a bunch of things I need to fix (e.g. there's no copy/paste, no resizing/editing shapes, etc.), so definitely not usable yet. Alright, end of human-written disclaimer.
+This is an experiment with vibe coding - kind of. 95% of the code was generated with Claude 3.7 Sonnet and this README was generated with Gemini 2.0 (except this disclaimer) over a weekend, although I had to fix bugs by hand because Claude has super low rate limits. Also the app has a bunch of things I need to fix (e.g. there's no copy/paste, no resizing/editing shapes, etc.), so definitely not usable yet. Alright, end of human-written disclaimer.
+
+# FlowDraw - A Vim-Inspired Whiteboard Web App
+![Logo](images/smalllogo.png)
 
 FlowDraw is a web-based whiteboard application designed for creating diagrams, flowcharts, and quick sketches. It features a grid-based canvas and Vim-like keyboard shortcuts for efficient navigation and drawing, eliminating the need for constant mouse interaction.  This README provides comprehensive documentation on how to use all of FlowDraw's features.
+
+## Keyboard Shortcuts Summary <a name="keyboard-shortcuts-summary"></a>
+
+| Key(s)                       | Action                                                                                                                                                 |
+| :--------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `h` / `ArrowLeft`            | Move cursor left                                                                                                                                       |
+| `j` / `ArrowDown`            | Move cursor down                                                                                                                                       |
+| `k` / `ArrowUp`              | Move cursor up                                                                                                                                         |
+| `l` / `ArrowRight`           | Move cursor right                                                                                                                                       |
+| `[`                          | Increase grid size                                                                                                                                      |
+| `]`                          | Decrease grid size                                                                                                                                      |
+| `r`                          | Start rectangle drawing                                                                                                                                 |
+| `a`                          | Start line drawing                                                                                                                                      |
+| `i`                          | Start text insertion                                                                                                                                    |
+| `Space`                      | Select shape / Fix shape point / Finalize multi-select                                                                                                 |
+| `Shift` + `Space`                 | Reverse shape cycling                                                                                                                          |
+| `Ctrl` + `Space`             | Enter multi-select mode                                                                                                                              |
+| `n` (in line drawing mode)  | Add arrowhead to end of line                                                                                                                           |
+| `m` (in line drawing mode)  | Add arrowheads to both ends of line                                                                                                                     |
+| `b` (in line drawing mode)   | Remove arrowheads (none)                                                                                                                             |
+| `H` (with selected shape)   | Move selected shape(s) left                                                                                                                            |
+| `J` (with selected shape)   | Move selected shape(s) down                                                                                                                            |
+| `K` (with selected shape)   | Move selected shape(s) up                                                                                                                              |
+| `L` (with selected shape)   | Move selected shape(s) right                                                                                                                            |
+| `d` / `Delete`              | Delete selected shape(s)                                                                                                                             |
+| `+` / `=`                    | Zoom in                                                                                                                                                |
+| `-` / `_`                    | Zoom out                                                                                                                                               |
+| `Ctrl` + `e`                 | Export to PNG                                                                                                                                           |
+| `Enter` (in text edit mode) | Save Text                                                                                                      |
+| `Shift + Enter` (in text edit mode) | Insert new line                                                                                                                                    |
+| `Escape`                     | Cancel action / Deselect / Exit mode / Discard text input |
 
 ## Table of Contents
 
@@ -21,7 +53,6 @@ FlowDraw is a web-based whiteboard application designed for creating diagrams, f
 7.  [Grid Management](#grid-management)
 8.  [Text Editing](#text-editing)
 9.  [Exporting](#exporting)
-10. [Keyboard Shortcuts Summary](#keyboard-shortcuts-summary)
 
 ## 1. Getting Started <a name="getting-started"></a>
 
@@ -130,33 +161,5 @@ Panning is automatic. The center of the canvas is always at grid coordinates (0,
 
 *   **`Ctrl` + `e`**: Export the current canvas as a PNG image.  The image will be downloaded automatically, and a message will briefly appear in the status bar. The exported image will have a white background and will *not* include the grid or cursor.
 
-## 10. Keyboard Shortcuts Summary <a name="keyboard-shortcuts-summary"></a>
-
-| Key(s)                       | Action                                                                                                                                                 |
-| :--------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `h` / `ArrowLeft`            | Move cursor left                                                                                                                                       |
-| `j` / `ArrowDown`            | Move cursor down                                                                                                                                       |
-| `k` / `ArrowUp`              | Move cursor up                                                                                                                                         |
-| `l` / `ArrowRight`           | Move cursor right                                                                                                                                       |
-| `[`                          | Increase grid size                                                                                                                                      |
-| `]`                          | Decrease grid size                                                                                                                                      |
-| `r`                          | Start rectangle drawing                                                                                                                                 |
-| `a`                          | Start line drawing                                                                                                                                      |
-| `i`                          | Start text insertion                                                                                                                                    |
-| `Space`                      | Select shape / Fix shape point / Finalize multi-select                                                                                                 |
-| `Shift` + `Space`                 | Reverse shape cycling                                                                                                                          |
-| `Ctrl` + `Space`             | Enter multi-select mode                                                                                                                              |
-| `n` (in line drawing mode)  | Add arrowhead to end of line                                                                                                                           |
-| `m` (in line drawing mode)  | Add arrowheads to both ends of line                                                                                                                     |
-| `b` (in line drawing mode)   | Remove arrowheads (none)                                                                                                                             |
-| `H` (with selected shape)   | Move selected shape(s) left                                                                                                                            |
-| `J` (with selected shape)   | Move selected shape(s) down                                                                                                                            |
-| `K` (with selected shape)   | Move selected shape(s) up                                                                                                                              |
-| `L` (with selected shape)   | Move selected shape(s) right                                                                                                                            |
-| `d` / `Delete`              | Delete selected shape(s)                                                                                                                             |
-| `+` / `=`                    | Zoom in                                                                                                                                                |
-| `-` / `_`                    | Zoom out                                                                                                                                               |
-| `Ctrl` + `e`                 | Export to PNG                                                                                                                                           |
-| `Enter` (in text edit mode) | Save Text                                                                                                      |
-| `Shift + Enter` (in text edit mode) | Insert new line                                                                                                                                    |
-| `Escape`                     | Cancel action / Deselect / Exit mode / Discard text input |
+## Images
+Check out the images folder for some images I made.
