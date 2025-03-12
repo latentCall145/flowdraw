@@ -27,15 +27,31 @@
       position: absolute;
       bottom: 10px;
       left: 10px;
-      background-color: rgba(255, 255, 255, 0.8);
-      padding: 10px;
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 15px;
       border-radius: 5px;
       font-size: 14px;
-      max-width: 300px;
+      max-width: 500px;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    #info-panel table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    #info-panel th, #info-panel td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    #info-panel th {
+      background-color: #f2f2f2;
     }
     .shortcut {
       font-weight: bold;
       color: #0066cc;
+      font-family: monospace;
     }
     #status {
       position: absolute;
@@ -46,23 +62,153 @@
       border-radius: 5px;
       font-size: 14px;
     }
+    .close-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      cursor: pointer;
+      background: #f44336;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .github-link {
+      display: block;
+      margin-top: 15px;
+      color: #0066cc;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .github-link:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
   <div id="canvas-container">
     <canvas id="canvas"></canvas>
     <div id="status">Grid Size: 80 | Mode: Navigate</div>
-    <!--<div id="info-panel">
-      <h3>Keyboard Controls:</h3>
-      <p><span class="shortcut">h/j/k/l</span> - Move cursor left/down/up/right</p>
-      <p><span class="shortcut">[/]</span> - Decrease/Increase grid size</p>
-      <p><span class="shortcut">r</span> - Create rectangle (select corners)</p>
-      <p><span class="shortcut">a</span> - Create line (select points)</p>
-      <p>When creating a line, after setting both points:</p>
-      <p><span class="shortcut">Enter</span> - Simple line</p>
-      <p><span class="shortcut">j + Enter</span> - End arrow</p>
-      <p><span class="shortcut">k + Enter</span> - Both arrows</p>
-    </div>-->
+    <div id="info-panel">
+      <button class="close-button" onclick="document.getElementById('info-panel').style.display='none'">×</button>
+      <h3>FlowDraw Keyboard Shortcuts</h3>
+      <table>
+        <tr>
+          <th>Key(s)</th>
+          <th>Action</th>
+        </tr>
+        <tr>
+          <td><span class="shortcut">h</span> / <span class="shortcut">ArrowLeft</span></td>
+          <td>Move cursor left</td>
+        </tr>
+        <tr>
+          <td><span class="shortcut">j</span> / <span class="shortcut">ArrowDown</span></td>
+          <td>Move cursor down</td>
+        </tr>
+        <tr>
+          <td><span class="shortcut">k</span> / <span class="shortcut">ArrowUp</span></td>
+          <td>Move cursor up</td>
+        </tr>
+        <tr>
+          <td><span class="shortcut">l</span> / <span class="shortcut">ArrowRight</span></td>
+          <td>Move cursor right</td>
+        </tr>
+        <tr>
+          <td><span class="shortcut">[</span></td>
+          <td>Increase grid size</td>
+        </tr>
+        <tr>
+          <td><span class="shortcut">]</span></td>
+          <td>Decrease grid size</td>
+        </tr>
+        <tr>
+          <td><span class="shortcut">r</span></td>
+          <td>Start rectangle drawing</td>
+        </tr>
+        <tr>
+          <td><span class="shortcut">a</span></td>
+          <td>Start line drawing</td>
+        </tr>
+        <tr>
+          <td><span class="shortcut">i</span></td>
+          <td>Start text insertion</td>
+        </tr>
+        <tr>
+          <td><span class="shortcut">Space</span></td>
+          <td>Select shape / Fix shape point / Finalize multi-select</td>
+        </tr>
+        <tr>
+          <td><span class="shortcut">Shift</span> + <span class="shortcut">Space</span></td>
+          <td>Reverse shape cycling</td>
+        </tr>
+        <tr>
+          <td><span class="shortcut">Ctrl</span> + <span class="shortcut">Space</span></td>
+          <td>Enter multi-select mode</td>
+        </tr>
+        <tr>
+          <td><span class="shortcut">n</span> (in line drawing mode)</td>
+          <td>Add arrowhead to end of line</td>
+        </tr>
+        <tr>
+          <td><span class="shortcut">m</span> (in line drawing mode)</td>
+          <td>Add arrowheads to both ends of line</td>
+        </tr>
+        <tr>
+          <td><span class="shortcut">b</span> (in line drawing mode)</td>
+          <td>Remove arrowheads (none)</td>
+        </tr>
+        <tr>
+          <td><span class="shortcut">H</span> (with selected shape)</td>
+          <td>Move selected shape(s) left</td>
+        </tr>
+        <tr>
+          <td><span class="shortcut">J</span> (with selected shape)</td>
+          <td>Move selected shape(s) down</td>
+        </tr>
+        <tr>
+          <td><span class="shortcut">K</span> (with selected shape)</td>
+          <td>Move selected shape(s) up</td>
+        </tr>
+        <tr>
+          <td><span class="shortcut">L</span> (with selected shape)</td>
+          <td>Move selected shape(s) right</td>
+        </tr>
+        <tr>
+          <td><span class="shortcut">d</span> / <span class="shortcut">Delete</span></td>
+          <td>Delete selected shape(s)</td>
+        </tr>
+        <tr>
+          <td><span class="shortcut">+</span> / <span class="shortcut">=</span></td>
+          <td>Zoom in</td>
+        </tr>
+        <tr>
+          <td><span class="shortcut">-</span> / <span class="shortcut">_</span></td>
+          <td>Zoom out</td>
+        </tr>
+        <tr>
+          <td><span class="shortcut">Ctrl</span> + <span class="shortcut">e</span></td>
+          <td>Export to PNG</td>
+        </tr>
+        <tr>
+          <td><span class="shortcut">Enter</span> (in text edit mode)</td>
+          <td>Save Text</td>
+        </tr>
+        <tr>
+          <td><span class="shortcut">Shift</span> + <span class="shortcut">Enter</span> (in text edit mode)</td>
+          <td>Insert new line</td>
+        </tr>
+        <tr>
+          <td><span class="shortcut">Escape</span></td>
+          <td>Cancel action / Deselect / Exit mode / Discard text input</td>
+        </tr>
+      </table>
+      <a href="https://github.com/latentCall145/flowdraw" target="_blank" class="github-link">View Complete Documentation on GitHub</a>
+    </div>
   </div>
 
   <script src="state.js"></script>
@@ -74,5 +220,18 @@
   <script src="events.js"></script>
   <script src="export.js"></script>
   <script src="init.js"></script>
+  <script>
+    // Add functionality to show/hide info panel
+    document.addEventListener('DOMContentLoaded', function() {
+      // Optional: Add a button to show the info panel if it's closed
+      const statusBar = document.getElementById('status');
+      const infoIcon = document.createElement('span');
+      infoIcon.innerHTML = ' | <span style="cursor:pointer;color:#0066cc;">ℹ️</span>';
+      infoIcon.onclick = function() {
+        document.getElementById('info-panel').style.display = 'block';
+      };
+      statusBar.appendChild(infoIcon);
+    });
+  </script>
 </body>
 </html>
